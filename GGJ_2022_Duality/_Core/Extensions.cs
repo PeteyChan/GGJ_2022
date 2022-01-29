@@ -288,11 +288,12 @@ public static class GodotExtensions
     {
         if (!Godot.Object.IsInstanceValid(node))
             return null;
+        var parent = node.GetParent();
 
-        if (node is T value)
+        if (parent is T value)
             return value;
 
-        return node.GetParent().FindParent<T>();
+        return parent.FindParent<T>();
     }
 
     public static bool TryFindParent<T>(this Godot.Node node, out T obj) where T : class
