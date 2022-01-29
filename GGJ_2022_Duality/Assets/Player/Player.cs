@@ -1,7 +1,7 @@
 using Godot;
 using System;
 
-public class Player : RigidBody
+public class Player : Area
 {
     InputAction left = new InputAction(Inputs.key_a, Inputs.joy1_lstick_left);
     InputAction right = new InputAction(Inputs.key_d, Inputs.joy1_lstick_right);
@@ -9,112 +9,181 @@ public class Player : RigidBody
     InputAction down = new InputAction(Inputs.key_w, Inputs.joy1_lstick_up);
     InputAction shoot = new InputAction(Inputs.key_space, Inputs.joy1_right_shoulder, Inputs.joy1_button_cross, Inputs.mouse_left_click);
 
-    public override void _Ready()
-    {
-        sprite = this.FindChild<Sprite3D>();
-        model = sprite.FindParent<Spatial>();
-        
-        previous_health = Health;
-        
-
-        this.OnEnterBody(node => {
-
-            switch(node)
-            {
-                case Enemy enemy:
-                    LinearVelocity = (Translation - enemy.Translation).Normalized() * 10f;
-                    stateMachine.next = States.EnemyColliison;
-                break;
-            }
-
-        });
-    }
+    InputAction enable_invincible = new InputAction(Inputs.key_i);
 
     Spatial model;
     Sprite3D sprite;
 
     Vector3 input_direction => new Vector3(right - left, 0, up - down);
 
-    [Export]
-    public float MoveSpeed = 10f;
-
-    [Export]
-    public int Health = 10;
-    int previous_health;
-
+    [Export] public float move_speed = 20f;
+    [Export] public float damaged_move_speed = 7f;
+    [Export] public int health = 10;
     Vector3 move_direction;
-
-    Color color = Colors.White;
-
     public StateMachine<States> stateMachine = new StateMachine<States>();
 
     public enum States
     {
+        SetUp,
         Default,
-        EnemyColliison
+        Invincible,
+        EnemyColliison,
+        Damaged,
+        Destroyed
     }
 
     float colliison_timer;
 
     float damage_timer;
 
+    Vector3 enemy_position;
+
+    bool damageable => stateMachine.current == States.Default ||
+                            stateMachine.current == States.EnemyColliison;
+
     public override void _PhysicsProcess(float delta)
     {
-        if (previous_health != Health)
-        {
-            damage_timer = .5f;
-            previous_health = Health;
-        }
-
-        if (damage_timer > 0)
-        {
-            damage_timer -= delta;
-            sprite.Modulate = Colors.White.lerp(Colors.Red, Mathf.Sin(Time.seconds_since_startup * 15f)/ 2f + .5f);
-        }
-        else sprite.Modulate = Colors.White;
-
         stateMachine.Update(delta);
 
         switch (stateMachine.current)
         {
+            case States.SetUp:
+            {
+                if (stateMachine.entered_state)
+                {
+                    sprite = this.FindChild<Sprite3D>();
+                    model = sprite.FindParent<Spatial>();
+
+                    var area = this.FindChild<Area>();
+
+                    area.OnAreaEnterArea(node =>
+                    {
+                        if (!damageable) return;
+
+                        switch (node)
+                        {
+                            case Bullet bullet:
+                            {
+                                if (bullet.source is Player)
+                                    break;
+
+                                health--;
+                                stateMachine.next = States.Damaged;
+                            }
+                            break;
+
+                            case Enemy enemy:
+                            {
+                                enemy_position = enemy.sprite.GlobalTransform.origin;
+                                stateMachine.next = States.EnemyColliison;
+                            }
+                            break;
+                        }
+                    });
+                }
+                stateMachine.next = States.Default;
+            }
+            break;
+
+            case States.Invincible:
+            {
+                if (stateMachine.entered_state)
+                    sprite.Modulate = Colors.LightBlue;
+
+                CanMove(move_speed);
+                CanShoot();
+                if (!enable_invincible.pressed)
+                    stateMachine.next = States.Default;
+            }
+            break;
+
             case States.Default:
             {
-                var tilt = new Vector2(input_direction.x, input_direction.z).tilt();
-                move_direction = move_direction.lerp(input_direction.Normalized() * tilt, 5f * delta);
-                LinearVelocity = move_direction * MoveSpeed;
+                if (stateMachine.entered_state)
+                    sprite.Modulate = Colors.White;
 
-                var rotate = move_direction.x * 20f;
-                model.RotationDegrees = new Vector3(0, 0, -rotate);
+                if (enable_invincible.pressed)
+                    stateMachine.next = States.Invincible;
 
-                if (shoot.on_pressed)
-                {
-                    Bullet.Spawn(this, Translation + Vector3.Left * .5f, Vector3.Forward, 20f);
-                    Bullet.Spawn(this, Translation + Vector3.Right * .5f, Vector3.Forward, 20f);
-                }
+                CanMove(move_speed);
+                CanShoot();
             }
             break;
 
             case States.EnemyColliison:
             {
                 if (stateMachine.entered_state)
-                    colliison_timer = 0;
-                
-                LinearVelocity = LinearVelocity.lerp(Vector3.Zero, delta);
-                colliison_timer += delta;
-                if (colliison_timer > .25f)
+                    health--;
+
+                DamageEffect();
+
+                Translation += ((Translation - enemy_position).Normalized() * 10f * delta).lerp(Vector3.Zero, stateMachine.current_time * 4f);
+
+                if (stateMachine.current_time > .25f)
                     stateMachine.next = States.Default;
 
                 if (stateMachine.exiting_state)
                     move_direction = new Vector3();
+
+                if (health <= 0)
+                    stateMachine.next = States.Destroyed;
+            }
+            break;
+
+            case States.Damaged:
+            {
+                CanMove(damaged_move_speed);
+                CanShoot();
+                DamageEffect();
+
+                if (stateMachine.current_time > .5f)
+                    stateMachine.next = States.Default;
+
+                if (health <= 0)
+                    stateMachine.next = States.Destroyed;
+
+            }
+            break;
+
+            case States.Destroyed:
+            {
+                QueueFree();
             }
             break;
         }
+
+        Translation = new Vector3(Translation.x.clamp(x_min, x_max), 0, Translation.z.clamp(z_min, z_max));
+
+        void DamageEffect()
+        {
+            sprite.Modulate = Colors.White.Altenate(Colors.Red, 20f);
+        }
+
+        void CanShoot()
+        {
+            if (shoot.pressed && Time.seconds_since_startup - last_shot > shot_cooldown)
+            {
+                Bullet.Spawn(this, Translation + new Vector3(-.5f, 0, 0), Vector3.Forward, 20f, 3f);
+                Bullet.Spawn(this, Translation + new Vector3(.5f, 0, 0), Vector3.Forward, 20f, 3f);
+                last_shot = Time.seconds_since_startup;
+            }
+        }
+
+        void CanMove(float move_speed)
+        {
+            var tilt = new Vector2(input_direction.x, input_direction.z).tilt();
+            move_direction = move_direction.lerp(input_direction.Normalized() * tilt, 5f * delta);
+            Translation = Translation += move_direction * move_speed * delta;
+        }
     }
 
-    [Event] static void LogStates(Events.FrameUpdate update)
-    {
-        var state = Scene.Current.FindChild<Player>().stateMachine.current;
-        Debug.Label(state);
-    }
+    float last_shot;
+
+    [Export] float shot_cooldown = .25f;
+
+    [Export] public float x_min = -11;
+    [Export] public float x_max = 11;
+    [Export] public float z_min = -10;
+    [Export] public float z_max = 10;
 }
 

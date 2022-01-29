@@ -1,63 +1,123 @@
 using Godot;
 using System;
 
-public class Enemy : RigidBody
+public class Enemy : Area
 {
-    public int health = 3;
-
-    public override void _Ready()
-    {
-        this.SetPhysicsProcess(false);
-        this.CollisionLayer = 0;
-        sprite = this.FindChild<Sprite3D>();
-        spriteColor = sprite.Modulate;
-
-        this.OnEnterPlayArea( () => {
-            previous_health = health;
-            this.CollisionLayer = 1;
-            var pos = GlobalTransform.origin;
-            this.SetPhysicsProcess(true);
-        });
-
-        this.OnExitPlayArea( () => {
-            Debug.Log(this.Name, "left the play area");
-            QueueFree();
-        });
-    }
-
-    Sprite3D sprite;
+    EnemySettings settings;
+    PathFollow follow_path;
+    public Sprite3D sprite;
     Color spriteColor;
+    float shoot_timer;
+    public enum States
+    {
+        Setup,
+        Default,
+        Damaged,
+        Destroyed
+    }
+    StateMachine<States> stateMachine = new StateMachine<States>();
+    float uptime;
 
-    float shoot_timer, damage_timer;
-    
-    int previous_health;
-    
+    bool damageable => stateMachine.current == States.Default ||
+                        stateMachine.current == States.Damaged;
     public override void _PhysicsProcess(float delta)
     {
-        if (previous_health != health)
+        stateMachine.Update(delta);
+        switch (stateMachine.current)
         {
-            previous_health = health;
-            damage_timer = .5f;
+            case States.Setup:
+                if (stateMachine.entered_state)
+                {
+                    sprite = this.FindChild<Sprite3D>();
+                    spriteColor = sprite.Modulate;
+                    follow_path = this.FindParent<PathFollow>();
+                    settings = this.FindParent<EnemySettings>();
+
+                    if (settings._auto_start)
+                        stateMachine.next = States.Default;
+                    else
+                        this.FindParent<Path>().OnEnterPlayArea(() =>
+                        {
+                            stateMachine.next = States.Default;
+                        });
+
+                    this.FindParent<Path>().OnExitPlayArea(() =>
+                    {
+                        stateMachine.next = States.Destroyed;
+                    });
+
+                    this.FindChild<Area>().OnAreaEnterArea(node =>
+                    {
+                        switch (node)
+                        {
+                            case Bullet bullet:
+                            {
+                                if (bullet.source is Player)
+                                {
+                                    if (stateMachine.current == States.Damaged ||
+                                        stateMachine.current == States.Default)
+                                    {
+                                        settings._health--;
+                                        stateMachine.next = States.Damaged;
+                                    }
+                                }
+                            }
+                            break;
+
+                            case Player player:
+                            {
+                                settings._health--;
+                                stateMachine.next = States.Damaged;
+                            }
+                            break;
+
+                            default:
+                                //Debug.Log(node?.Name);
+                            break;
+                        }
+
+                    });
+                }
+                break;
+
+            case States.Default:
+            {
+                if (stateMachine.entered_state)
+                    sprite.Modulate = spriteColor;
+
+                Move(settings._move_speed);
+
+                if (shoot_timer < 0 && sprite.GlobalTransform.origin.z > -10)
+                {
+                    Bullet.Spawn(this, sprite.GlobalTransform.origin, Vector3.Back, 15f, 3f);
+                    shoot_timer = Rand.FloatRange(settings._shoot_min_interval, settings._shoot_max_interval);
+                }
+                shoot_timer -= delta;
+            }
+            break;
+
+            case States.Damaged:
+            {
+                Move(settings._damaged_move_speed);
+                sprite.Modulate = Colors.White.Altenate(Colors.Red, 15f);
+                if (stateMachine.current_time > .5f)
+                    stateMachine.next = States.Default;
+
+                if (settings._health <= 0)
+                    stateMachine.next = States.Destroyed;
+            }
+            break;
+
+            case States.Destroyed:
+                QueueFree();
+                break;
         }
 
-        if (damage_timer > 0)
+        void Move(float speed)
         {
-            damage_timer -= delta;
-            sprite.Modulate = Colors.White.Altenate(Colors.Red, 15f);
+            follow_path.Offset = uptime += delta * speed * (settings._reverse_movement ? -1f : 1f);
         }
-        else sprite.Modulate = spriteColor;
-
-
-        LinearVelocity = 5f*Vector3.Back;
-        shoot_timer += delta;
-        if (shoot_timer > 1f)
-        {
-            Bullet.Spawn(this, GlobalTransform.origin, Vector3.Back, 10f, 3f);
-            shoot_timer = 0;
-        }
-
-        if (health <= 0) QueueFree();
-    }    
+    }
 
 }
 
@@ -65,6 +125,6 @@ public static partial class Extensions
 {
     public static Color Altenate(this Color initial, Color target, float speed = 1f, float offset = 0)
     {
-        return initial.lerp(target, Mathf.Sin(Time.seconds_since_startup * speed + offset)/2f + .5f);
+        return initial.lerp(target, Mathf.Sin(Time.seconds_since_startup * speed + offset) / 2f + .5f);
     }
 }

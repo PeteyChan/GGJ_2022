@@ -1,48 +1,23 @@
-[gd_scene load_steps=7 format=2]
+[gd_scene load_steps=5 format=2]
 
 [ext_resource path="res://Assets/Player/Player.tscn" type="PackedScene" id=1]
 [ext_resource path="res://Assets/Enemy/Enemy.tscn" type="PackedScene" id=2]
 [ext_resource path="res://Scenes/Level/HealthUI.cs" type="Script" id=3]
 [ext_resource path="res://Scenes/Level/Level.cs" type="Script" id=4]
 
-[sub_resource type="PhysicsMaterial" id=2]
-friction = 0.0
-absorbent = true
-
-[sub_resource type="BoxShape" id=1]
-extents = Vector3( 1, 1, 16 )
-
 [node name="Spatial" type="Spatial"]
 
 [node name="Player" parent="." instance=ExtResource( 1 )]
-physics_material_override = SubResource( 2 )
-MoveSpeed = 15.0
+move_speed = 15.0
+damaged_move_speed = 10.0
 
-[node name="PlayArea" type="KinematicBody" parent="."]
-collision_layer = 2
-collision_mask = 2
+[node name="PlayArea" type="Node" parent="."]
 
 [node name="Camera" type="Camera" parent="PlayArea"]
 transform = Transform( 1, 0, 0, 0, -4.37114e-08, 1, 0, -1, -4.37114e-08, 0, 10, 0 )
 keep_aspect = 0
 projection = 1
 size = 40.0
-
-[node name="CollisionShape" type="CollisionShape" parent="PlayArea"]
-transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -13, 0, 0 )
-shape = SubResource( 1 )
-
-[node name="CollisionShape2" type="CollisionShape" parent="PlayArea"]
-transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 13, 0, 0 )
-shape = SubResource( 1 )
-
-[node name="CollisionShape3" type="CollisionShape" parent="PlayArea"]
-transform = Transform( -4.37114e-08, 0, 1, 0, 1, 0, -1, 0, -4.37114e-08, 0, 0, 12 )
-shape = SubResource( 1 )
-
-[node name="CollisionShape4" type="CollisionShape" parent="PlayArea"]
-transform = Transform( -4.37114e-08, 0, 1, 0, 1, 0, -1, 0, -4.37114e-08, 0, 0, -15.8163 )
-shape = SubResource( 1 )
 
 [node name="CanvasLayer" type="CanvasLayer" parent="."]
 
@@ -86,30 +61,42 @@ transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -5.69892, 0, -25.0274 )
 
 [node name="Enemy4" parent="Enemy Placements" instance=ExtResource( 2 )]
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -9.91526, 0, -45.0988 )
+_move_speed = 8.0
 
 [node name="Enemy5" parent="Enemy Placements" instance=ExtResource( 2 )]
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -7.73363, 0, -48.3469 )
+_move_speed = 8.0
 
 [node name="Enemy6" parent="Enemy Placements" instance=ExtResource( 2 )]
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -5.69892, 0, -51.0274 )
+_move_speed = 8.0
 
 [node name="Enemy7" parent="Enemy Placements" instance=ExtResource( 2 )]
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 4.67696, 0, -35.563 )
+_reverse_movement = true
 
 [node name="Enemy8" parent="Enemy Placements" instance=ExtResource( 2 )]
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 6.85859, 0, -38.8111 )
+_reverse_movement = true
 
 [node name="Enemy9" parent="Enemy Placements" instance=ExtResource( 2 )]
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 8.8933, 0, -41.4916 )
+_reverse_movement = true
 
 [node name="Enemy10" parent="Enemy Placements" instance=ExtResource( 2 )]
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 4.67696, 0, -64.563 )
+_shoot_max_interval = 2.0
+_move_speed = 10.0
 
 [node name="Enemy11" parent="Enemy Placements" instance=ExtResource( 2 )]
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 6.85859, 0, -67.8111 )
+_shoot_max_interval = 2.0
+_move_speed = 10.0
 
 [node name="Enemy12" parent="Enemy Placements" instance=ExtResource( 2 )]
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 8.8933, 0, -70.4916 )
+_shoot_max_interval = 2.0
+_move_speed = 10.0
 
 [node name="Enemy13" parent="Enemy Placements" instance=ExtResource( 2 )]
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -9.49924, 0, -77.1849 )
@@ -119,3 +106,21 @@ transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -7.31761, 0, -80.433 )
 
 [node name="Enemy15" parent="Enemy Placements" instance=ExtResource( 2 )]
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -5.28289, 0, -83.1135 )
+
+[node name="Enemy16" parent="Enemy Placements" instance=ExtResource( 2 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -1.49924, 0, -105.185 )
+_shoot_min_interval = 0.5
+_shoot_max_interval = 2.0
+_move_speed = 12.0
+
+[node name="Enemy17" parent="Enemy Placements" instance=ExtResource( 2 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0.682395, 0, -108.433 )
+_shoot_min_interval = 0.5
+_shoot_max_interval = 2.0
+_move_speed = 12.0
+
+[node name="Enemy18" parent="Enemy Placements" instance=ExtResource( 2 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 2.71711, 0, -111.113 )
+_shoot_min_interval = 0.5
+_shoot_max_interval = 2.0
+_move_speed = 12.0

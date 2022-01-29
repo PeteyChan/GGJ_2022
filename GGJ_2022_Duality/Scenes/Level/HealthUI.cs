@@ -14,8 +14,8 @@ public class HealthUI : Label
 
     public override void _Process(float delta)
     {
-        if (current != player.Health)
-            Text = $"Health: {current = player.Health}";
+        if (current != player.health)
+            Text = $"Health: {current = player.health}";
     }
 
 }

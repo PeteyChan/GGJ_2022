@@ -4,39 +4,42 @@ using System.Collections.Generic;
 
 public class Level : Node
 {
-    [Export]
-    public float ScrollingSpeed = 5f;
+    [Export] public float InactiveEnemyScrollSpeed = 5f;
+    [Export] public float ActiveEnemyScrollSpeed = 1f;
 
     List<Spatial> LevelObjects = new List<Spatial>();
 
     public override void _Ready()
     {
-        foreach(var child in this.GetChildren())
+        LevelObjects.Clear();
+        ActiveObjects.Clear();
+
+        foreach (var child in this.GetChildren())
         {
             if (child is Spatial spatial)
                 LevelObjects.Add(spatial);
-        }    
+        }
     }
 
-    List<Spatial> ActiveObjects = new List<Spatial>();
+    public static List<Spatial> ActiveObjects = new List<Spatial>();
 
     public override void _PhysicsProcess(float delta)
     {
-        for(int i = LevelObjects.Count-1; i >= 0; -- i)
+        for (int i = LevelObjects.Count - 1; i >= 0; --i)
         {
             var item = LevelObjects[i];
             var zpos = item.Translation.z;
+
             if (zpos > -12)
             {
-                Debug.Log(item.Name, "entered play area");
                 LevelObjects.RemoveAt(i);
                 ActiveObjects.Add(item);
                 item.Send<EnterPlayArea>(null);
             }
-            else item.Translate(new Vector3(0, 0, ScrollingSpeed) * delta);
+            else item.Translate(new Vector3(0, 0, InactiveEnemyScrollSpeed) * delta);
         }
 
-        for(int i = ActiveObjects.Count - 1; i >= 0; --i)
+        for (int i = ActiveObjects.Count - 1; i >= 0; --i)
         {
             var item = ActiveObjects[i];
 
@@ -46,14 +49,28 @@ public class Level : Node
                 continue;
             }
 
+            item.Translation += new Vector3(0, 0, GetActiveScrollSpeed(item) * delta * ActiveEnemyScrollSpeed);
+
             var x = item.Translation.x;
             var z = item.Translation.z;
             if (x < -14 || x > 14 || z < -14 || z > 14)
             {
                 ActiveObjects.RemoveAt(i);
-                item.Send<ExitPlayArea>(null);   
+                item.Send<ExitPlayArea>(null);
                 item.QueueFree();
             }
+        }
+    }
+
+    public float GetActiveScrollSpeed(object obj)
+    {
+        switch (obj)
+        {
+            case EnemySettings enemy:
+                return enemy.level_scroll_speed;
+
+            default:
+                return 1f;
         }
     }
 
@@ -62,8 +79,8 @@ public class Level : Node
         Scene.Load("res://Scenes/Level/Level.tscn");
     }
 
-    public class EnterPlayArea{}
-    public class ExitPlayArea{}
+    public class EnterPlayArea { }
+    public class ExitPlayArea { }
 }
 
 public static partial class Extensions

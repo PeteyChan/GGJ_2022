@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 public class Bullet : Area
 {
-    public static Bullet Spawn(Node owner, Vector3 position, Vector3 direction, float speed, float lifespan = 2f)
+    public static Bullet Spawn(Node source, Vector3 position, Vector3 direction, float speed, float lifespan = 2f)
     {
         Bullet bullet = null;
         while (bullets.Count > 0)
@@ -21,7 +21,7 @@ public class Bullet : Area
         bullet.velocity = direction.Normalized() * speed;
         bullet.time_alive = 0;
         bullet.lifespan = lifespan;
-        bullet.owner = owner;
+        bullet.source = source;
         Scene.Current.AddChild(bullet);
         return bullet;
     }
@@ -31,37 +31,23 @@ public class Bullet : Area
     [Export]
     public float lifespan = 2f;
     float time_alive;
-    Node owner;
-    Vector3 velocity;
+    public Node source;
+    [Export] Vector3 velocity = new Vector3(0, 0, 10);
     Sprite3D sprite;
-
-    public override void _Ready()
-    {
-        this.OnAreaEnterBody(node => {
-            switch (node)
-            {
-                case Player player:
-                {
-                    if (owner is Enemy enemy)
-                        player.Health --;
-                }
-                break;
-
-                case Enemy enemy:
-                {                    
-                    if (owner is Player player)
-                        enemy.health --;
-                }                
-                break;
-            }
-        });
-    }
 
     public void SetColor(Color color)
     {
         if (!sprite.IsValid())
             sprite = this.FindChild<Sprite3D>();
         sprite.Modulate = color;
+    }
+
+    public override void _Ready()
+    {
+        this.OnAreaEnterArea(node => {
+            if (node != source)
+                QueueFree();
+        });
     }
 
     public override void _PhysicsProcess(float delta)
