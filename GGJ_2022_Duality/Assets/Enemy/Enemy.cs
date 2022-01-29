@@ -5,7 +5,7 @@ public class Enemy : Area
 {
     EnemySettings settings;
     PathFollow follow_path;
-    public Sprite3D sprite;
+    public AnimatedSprite3D sprite;
     Color spriteColor;
     float shoot_timer;
     public enum States
@@ -27,7 +27,7 @@ public class Enemy : Area
             case States.Setup:
                 if (stateMachine.entered_state)
                 {
-                    sprite = this.FindChild<Sprite3D>();
+                    sprite = this.FindChild<AnimatedSprite3D>();
                     spriteColor = sprite.Modulate;
                     follow_path = this.FindParent<PathFollow>();
                     settings = this.FindParent<EnemySettings>();
@@ -43,7 +43,7 @@ public class Enemy : Area
 
                     this.FindParent<Path>().OnExitPlayArea(() =>
                     {
-                        QueueFree();
+                        stateMachine.next = States.Destroyed;
                     });
 
                     this.FindChild<Area>().OnAreaEnterArea(node =>
@@ -73,7 +73,7 @@ public class Enemy : Area
                             break;
 
                             default:
-                                //Debug.Log(node?.Name);
+
                             break;
                         }
 
@@ -110,6 +110,7 @@ public class Enemy : Area
             break;
 
             case States.Destroyed:
+                EnemyDestroyAnimation.Spawn(sprite.GlobalTransform.origin);
                 QueueFree();
                 break;
         }

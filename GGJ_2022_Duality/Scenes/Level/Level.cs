@@ -55,7 +55,6 @@ public class Level : Node
             var z = item.Translation.z;
             if (x < -14 || x > 14 || z > 32)
             {
-                Debug.Log(item.Name, "Destroyed");
                 ActiveObjects.RemoveAt(i);
                 item.Send<ExitPlayArea>(null);
             }
