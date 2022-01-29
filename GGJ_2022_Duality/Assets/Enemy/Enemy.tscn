@@ -6,7 +6,7 @@
 
 [sub_resource type="Curve3D" id=2]
 _data = {
-"points": PoolVector3Array( 0, 0, 0, 0, 0, 0, 0, 0, -8, 0, 0, -8, 0, 0, 8, 10, 0, -0.281715, 0, 0, 0, 0, 0, 0, 0, 0, 8, 0, 0, 8, 0, 0, -8, -10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -8 ),
+"points": PoolVector3Array( 0, 0, -8, 0, 0, 8, 10, 0, -0.281715, 0, 0, 0, 0, 0, 0, 0, 0, 8, 0, 0, 8, 0, 0, -8, -10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -8, 0, 0, -8, 0, 0, 8, 10, 0, -0.281715 ),
 "tilts": PoolRealArray( 0, 0, 0, 0, 0 )
 }
 
@@ -20,7 +20,7 @@ __meta__ = {
 }
 
 [node name="PathFollow" type="PathFollow" parent="."]
-transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -8 )
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 10, 0, -0.281715 )
 rotation_mode = 0
 
 [node name="Enemy" type="Area" parent="PathFollow"]

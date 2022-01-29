@@ -61,15 +61,18 @@ transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -5.69892, 0, -25.0274 )
 
 [node name="Enemy4" parent="Enemy Placements" instance=ExtResource( 2 )]
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -9.91526, 0, -45.0988 )
-_move_speed = 8.0
+_move_speed = 2.0
+_health = 10.0
 
 [node name="Enemy5" parent="Enemy Placements" instance=ExtResource( 2 )]
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -7.73363, 0, -48.3469 )
-_move_speed = 8.0
+_move_speed = 2.0
+_health = 10.0
 
 [node name="Enemy6" parent="Enemy Placements" instance=ExtResource( 2 )]
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -5.69892, 0, -51.0274 )
-_move_speed = 8.0
+_move_speed = 2.0
+_health = 10.0
 
 [node name="Enemy7" parent="Enemy Placements" instance=ExtResource( 2 )]
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 4.67696, 0, -35.563 )
@@ -98,29 +101,154 @@ transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 8.8933, 0, -70.4916 )
 _shoot_max_interval = 2.0
 _move_speed = 10.0
 
+[node name="Enemy43" parent="Enemy Placements" instance=ExtResource( 2 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 10.8933, 0, -72.4916 )
+_shoot_max_interval = 2.0
+_move_speed = 10.0
+
+[node name="Enemy44" parent="Enemy Placements" instance=ExtResource( 2 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 12.8933, 0, -74.4916 )
+_shoot_max_interval = 2.0
+_move_speed = 10.0
+
 [node name="Enemy13" parent="Enemy Placements" instance=ExtResource( 2 )]
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -9.49924, 0, -77.1849 )
+_reverse_movement = true
 
 [node name="Enemy14" parent="Enemy Placements" instance=ExtResource( 2 )]
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -7.31761, 0, -80.433 )
+_reverse_movement = true
 
 [node name="Enemy15" parent="Enemy Placements" instance=ExtResource( 2 )]
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -5.28289, 0, -83.1135 )
+_reverse_movement = true
 
 [node name="Enemy16" parent="Enemy Placements" instance=ExtResource( 2 )]
-transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -1.49924, 0, -105.185 )
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0.500765, 0, -105.185 )
 _shoot_min_interval = 0.5
 _shoot_max_interval = 2.0
 _move_speed = 12.0
+_health = 6.0
 
 [node name="Enemy17" parent="Enemy Placements" instance=ExtResource( 2 )]
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0.682395, 0, -108.433 )
 _shoot_min_interval = 0.5
 _shoot_max_interval = 2.0
 _move_speed = 12.0
+_health = 6.0
 
 [node name="Enemy18" parent="Enemy Placements" instance=ExtResource( 2 )]
-transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 2.71711, 0, -111.113 )
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0.717106, 0, -111.113 )
 _shoot_min_interval = 0.5
 _shoot_max_interval = 2.0
 _move_speed = 12.0
+_health = 6.0
+
+[node name="Enemy19" parent="Enemy Placements" instance=ExtResource( 2 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -0.91526, 0, -131.099 )
+
+[node name="Enemy20" parent="Enemy Placements" instance=ExtResource( 2 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 1.26637, 0, -134.347 )
+
+[node name="Enemy21" parent="Enemy Placements" instance=ExtResource( 2 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 3.30108, 0, -137.027 )
+
+[node name="Enemy22" parent="Enemy Placements" instance=ExtResource( 2 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -0.91526, 0, -157.099 )
+_move_speed = 8.0
+
+[node name="Enemy23" parent="Enemy Placements" instance=ExtResource( 2 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 1.26637, 0, -160.347 )
+_move_speed = 8.0
+
+[node name="Enemy24" parent="Enemy Placements" instance=ExtResource( 2 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 3.30108, 0, -163.027 )
+_move_speed = 8.0
+
+[node name="Enemy25" parent="Enemy Placements" instance=ExtResource( 2 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 14.8436, 0, -147.563 )
+_reverse_movement = true
+
+[node name="Enemy26" parent="Enemy Placements" instance=ExtResource( 2 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 17.0252, 0, -150.811 )
+_reverse_movement = true
+
+[node name="Enemy27" parent="Enemy Placements" instance=ExtResource( 2 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 19.0599, 0, -153.492 )
+_reverse_movement = true
+
+[node name="Enemy28" parent="Enemy Placements" instance=ExtResource( 2 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 14.8436, 0, -176.563 )
+_shoot_max_interval = 2.0
+_move_speed = 10.0
+
+[node name="Enemy29" parent="Enemy Placements" instance=ExtResource( 2 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 17.0252, 0, -179.811 )
+_shoot_max_interval = 2.0
+_move_speed = 10.0
+
+[node name="Enemy30" parent="Enemy Placements" instance=ExtResource( 2 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 19.0599, 0, -182.492 )
+_shoot_max_interval = 2.0
+_move_speed = 10.0
+
+[node name="Enemy37" parent="Enemy Placements" instance=ExtResource( 2 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -17.1564, 0, -147.563 )
+_reverse_movement = true
+
+[node name="Enemy38" parent="Enemy Placements" instance=ExtResource( 2 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -14.9748, 0, -150.811 )
+_reverse_movement = true
+
+[node name="Enemy39" parent="Enemy Placements" instance=ExtResource( 2 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -12.9401, 0, -153.492 )
+_reverse_movement = true
+
+[node name="Enemy40" parent="Enemy Placements" instance=ExtResource( 2 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -17.1564, 0, -176.563 )
+_reverse_movement = true
+_shoot_max_interval = 2.0
+_move_speed = 10.0
+
+[node name="Enemy41" parent="Enemy Placements" instance=ExtResource( 2 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -14.9748, 0, -179.811 )
+_reverse_movement = true
+_shoot_max_interval = 2.0
+_move_speed = 10.0
+
+[node name="Enemy42" parent="Enemy Placements" instance=ExtResource( 2 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -12.9401, 0, -182.492 )
+_reverse_movement = true
+_shoot_max_interval = 2.0
+_move_speed = 10.0
+
+[node name="Enemy31" parent="Enemy Placements" instance=ExtResource( 2 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -0.499235, 0, -189.185 )
+
+[node name="Enemy32" parent="Enemy Placements" instance=ExtResource( 2 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 1.68239, 0, -192.433 )
+
+[node name="Enemy33" parent="Enemy Placements" instance=ExtResource( 2 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 3.71711, 0, -195.113 )
+
+[node name="Enemy34" parent="Enemy Placements" instance=ExtResource( 2 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0.500765, 0, -217.185 )
+_shoot_min_interval = 0.5
+_shoot_max_interval = 1.0
+_move_speed = 6.0
+_health = 16.0
+
+[node name="Enemy35" parent="Enemy Placements" instance=ExtResource( 2 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0.682395, 0, -220.433 )
+_reverse_movement = true
+_shoot_min_interval = 0.5
+_shoot_max_interval = 1.0
+_move_speed = 6.0
+_health = 16.0
+
+[node name="Enemy36" parent="Enemy Placements" instance=ExtResource( 2 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0.717106, 0, -223.113 )
+_shoot_min_interval = 0.5
+_shoot_max_interval = 1.0
+_move_speed = 6.0
+_health = 16.0

@@ -16,7 +16,6 @@ public class Enemy : Area
         Destroyed
     }
     StateMachine<States> stateMachine = new StateMachine<States>();
-    float uptime;
 
     bool damageable => stateMachine.current == States.Default ||
                         stateMachine.current == States.Damaged;
@@ -32,6 +31,7 @@ public class Enemy : Area
                     spriteColor = sprite.Modulate;
                     follow_path = this.FindParent<PathFollow>();
                     settings = this.FindParent<EnemySettings>();
+                    follow_path.Loop = true;
 
                     if (settings._auto_start)
                         stateMachine.next = States.Default;
@@ -43,7 +43,7 @@ public class Enemy : Area
 
                     this.FindParent<Path>().OnExitPlayArea(() =>
                     {
-                        stateMachine.next = States.Destroyed;
+                        QueueFree();
                     });
 
                     this.FindChild<Area>().OnAreaEnterArea(node =>
@@ -116,7 +116,7 @@ public class Enemy : Area
 
         void Move(float speed)
         {
-            follow_path.Offset = uptime += delta * speed * (settings._reverse_movement ? -1f : 1f);
+            follow_path.Offset += delta * speed * (settings._reverse_movement ? -1f : 1f);
         }
     }
 
