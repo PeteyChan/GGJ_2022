@@ -60,6 +60,7 @@ public class Enemy : Area
                                         settings._health--;
                                         stateMachine.next = States.Damaged;
                                     }
+                                    bullet.Destroy();
                                 }
                             }
                             break;

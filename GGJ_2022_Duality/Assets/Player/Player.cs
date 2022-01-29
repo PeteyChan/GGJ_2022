@@ -69,6 +69,7 @@ public class Player : Area
 
                                 health--;
                                 stateMachine.next = States.Damaged;
+                                bullet.Destroy();
                             }
                             break;
 
@@ -102,8 +103,10 @@ public class Player : Area
                 if (stateMachine.entered_state)
                     sprite.Modulate = Colors.White;
 
+                #if DEBUG
                 if (enable_invincible.pressed)
                     stateMachine.next = States.Invincible;
+                #endif
 
                 CanMove(move_speed);
                 CanShoot();
