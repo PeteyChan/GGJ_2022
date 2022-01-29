@@ -10,9 +10,9 @@ public class Player : Area
     InputAction shoot = new InputAction(Inputs.key_space, Inputs.joy1_right_shoulder, Inputs.joy1_button_cross, Inputs.mouse_left_click);
 
     InputAction enable_invincible = new InputAction(Inputs.key_i);
-
+    AnimationPlayer animator;
     Spatial model;
-    Sprite3D sprite;
+    AnimatedSprite3D sprite;
 
     Vector3 input_direction => new Vector3(right - left, 0, up - down);
 
@@ -41,8 +41,12 @@ public class Player : Area
     bool damageable => stateMachine.current == States.Default ||
                             stateMachine.current == States.EnemyColliison;
 
+    bool shooting;
+
     public override void _PhysicsProcess(float delta)
     {
+        shooting = false;
+
         stateMachine.Update(delta);
 
         switch (stateMachine.current)
@@ -51,8 +55,9 @@ public class Player : Area
             {
                 if (stateMachine.entered_state)
                 {
-                    sprite = this.FindChild<Sprite3D>();
+                    sprite = this.FindChild<AnimatedSprite3D>();
                     model = sprite.FindParent<Spatial>();
+                    animator = this.FindChild<AnimationPlayer>();
 
                     var area = this.FindChild<Area>();
 
@@ -157,6 +162,12 @@ public class Player : Area
 
         Translation = new Vector3(Translation.x.clamp(x_min, x_max), 0, Translation.z.clamp(z_min, z_max));
 
+        if (shooting)
+        {
+            animator.Play("Shoot");            
+        }
+        else animator.Play("Idle");
+
         void DamageEffect()
         {
             sprite.Modulate = Colors.White.Altenate(Colors.Red, 20f);
@@ -164,12 +175,16 @@ public class Player : Area
 
         void CanShoot()
         {
+            if (shoot.pressed)
+                shooting = true;
+            
+            /*
             if (shoot.pressed && Time.seconds_since_startup - last_shot > shot_cooldown)
             {
                 Bullet.Spawn(this, Translation + new Vector3(-.5f, 0, 0), Vector3.Forward, 20f, 3f);
                 Bullet.Spawn(this, Translation + new Vector3(.5f, 0, 0), Vector3.Forward, 20f, 3f);
                 last_shot = Time.seconds_since_startup;
-            }
+            }*/
         }
 
         void CanMove(float move_speed)
@@ -188,5 +203,17 @@ public class Player : Area
     [Export] public float x_max = 11;
     [Export] public float z_min = -10;
     [Export] public float z_max = 10;
+
+    [Export] public float shot_speed = 20f;
+
+    public void ShootLeft()
+    {
+        Bullet.Spawn(this, Translation + new Vector3(-.75f, 0, -1f), Vector3.Forward, shot_speed);
+    }
+
+    public void ShootRight()
+    {
+        Bullet.Spawn(this, Translation + new Vector3(.75f, 0, -1f), Vector3.Forward, shot_speed);
+    }
 }
 

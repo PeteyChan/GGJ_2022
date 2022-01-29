@@ -9,10 +9,6 @@
 
 [node name="Spatial" type="Spatial"]
 
-[node name="Player" parent="." instance=ExtResource( 1 )]
-move_speed = 15.0
-damaged_move_speed = 10.0
-
 [node name="PlayArea" type="Node" parent="."]
 
 [node name="Camera" type="Camera" parent="PlayArea"]
@@ -285,3 +281,5 @@ _shoot_min_interval = 0.5
 _shoot_max_interval = 1.0
 _move_speed = 6.0
 _health = 16.0
+
+[node name="Player" parent="." instance=ExtResource( 1 )]
