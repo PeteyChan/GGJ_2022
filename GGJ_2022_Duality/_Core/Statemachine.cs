@@ -1,6 +1,6 @@
 public class StateMachine<States> where States : struct, System.Enum
 {
-    public StateMachine()
+    public StateMachine(States initial_state = default)
     {
         next = current;
     }

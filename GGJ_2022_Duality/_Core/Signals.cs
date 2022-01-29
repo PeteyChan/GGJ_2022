@@ -140,6 +140,10 @@ public static class Signals
     public static Emitter OnVisibilityChanged<Emitter>(this Emitter emitter, System.Action action) where Emitter : Godot.CanvasItem
         => Connect("visibility_changed", emitter, action);
 
+    public static Emitter OnVisibilityChange<Emitter>(this Emitter emitter, System.Action action) where Emitter : Godot.Spatial
+        => Connect("visibility_changed", emitter, action);
+
+
     public static Emitter OnProcess<Emitter>(this Emitter emitter, System.Action<float> action) where Emitter : Godot.Node
     {
         foreach(Godot.Node child in emitter.GetChildren())
