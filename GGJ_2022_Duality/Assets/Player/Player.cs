@@ -172,8 +172,12 @@ public class Player : Area
 
             case States.Destroyed:
             {
+                if (stateMachine.entered_state)
+                    FadeToColor.SetColor(new Color(0,0,0,1), 3f);
+
+
                 sprite.Visible = false;
-                if (stateMachine.current_time > 5f)
+                if (stateMachine.current_time > 4f)
                 {
                     Coroutine.Defer(
                         () => Scene.Load("res://Scenes/Level/Level.tscn")
@@ -183,14 +187,21 @@ public class Player : Area
             break;
 
             case States.Win:
+
+                if (stateMachine.entered_state)
+                {
+                    FadeToColor.SetColor(Colors.White , 3f);
+                }
+                
                 sprite.Modulate = Colors.White;
-                CanMove(move_speed);
+                Translation = Translation + Vector3.Forward * 8f * delta;
                 break;
         }
 
-        Translation = new Vector3(Translation.x.clamp(x_min, x_max), 0, Translation.z.clamp(z_min, z_max));
+        if (stateMachine.current != States.Win)
+            Translation = new Vector3(Translation.x.clamp(x_min, x_max), 0, Translation.z.clamp(z_min, z_max));
 
-        if (boss?.health <= 0)
+        if (stateMachine.current != States.Win && boss?.health <= 0)
             stateMachine.next = States.Win;
 
 #if DEBUG

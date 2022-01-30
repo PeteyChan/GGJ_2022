@@ -105,7 +105,7 @@ public class Boss : Area
                 break;
 
             case States.Destroyed:
-                Debug.Label("You Win");
+                
                 break;
         }
 
