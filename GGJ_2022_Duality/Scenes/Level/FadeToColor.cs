@@ -22,7 +22,6 @@ public class FadeToColor : ColorRect
             if (current_fade > fade_timer)
             {
                 color = null;
-                Debug.Log("Completed Fade");
             }
             else
             {
