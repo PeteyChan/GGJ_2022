@@ -9,7 +9,7 @@ public class Player : Area
     InputAction down = new InputAction(Inputs.key_w, Inputs.joy1_lstick_up);
     InputAction shoot = new InputAction(Inputs.key_space, Inputs.joy1_right_shoulder, Inputs.joy1_button_cross, Inputs.mouse_left_click);
 
-    InputAction enable_invincible = new InputAction(Inputs.key_i);
+    bool enable_invincible;
     AnimationPlayer animator;
     Spatial model;
     AnimatedSprite3D sprite;
@@ -106,22 +106,21 @@ public class Player : Area
                 if (stateMachine.entered_state)
                     sprite.Modulate = Colors.LightBlue;
 
+                if (!enable_invincible)
+                    stateMachine.next =  States.Default;
+
                 CanMove(move_speed);
                 CanShoot();
-                if (!enable_invincible.pressed)
-                    stateMachine.next = States.Default;
             }
             break;
 
             case States.Default:
             {
+                if (enable_invincible)
+                    stateMachine.next = States.Invincible;
+
                 if (stateMachine.entered_state)
                     sprite.Modulate = Colors.White;
-
-#if DEBUG
-                if (enable_invincible.pressed)
-                    stateMachine.next = States.Invincible;
-#endif
 
                 CanMove(move_speed);
                 CanShoot();
@@ -192,6 +191,9 @@ public class Player : Area
                 {
                     FadeToColor.SetColor(Colors.White , 3f);
                 }
+
+                if (stateMachine.current_time > 4f)
+                    Scene.Load("res://Scenes/Victory/Victory.tscn");
                 
                 sprite.Modulate = Colors.White;
                 Translation = Translation + Vector3.Forward * 8f * delta;
@@ -262,6 +264,15 @@ public class Player : Area
     {
         Bullet.Spawn(this, Translation + new Vector3(.75f, 0, -1f), Vector3.Forward, shot_speed);
         PlayerShootSound.PlaySound();
+    }
+
+    static void GodMode(Command args)
+    {
+        var player = Scene.Current.FindChild<Player>();
+        if (player.IsValid())
+        {
+            player.enable_invincible = !player.enable_invincible;
+        }
     }
 }
 
