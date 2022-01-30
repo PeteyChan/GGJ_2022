@@ -6,6 +6,7 @@ public class Level : Node
 {
     [Export] public float InactiveEnemyScrollSpeed = 5f;
     [Export] public float ActiveEnemyScrollSpeed = 1f;
+    [Export] public bool BossOnly = false;
 
     List<Spatial> LevelObjects = new List<Spatial>();
 
@@ -14,10 +15,19 @@ public class Level : Node
         LevelObjects.Clear();
         ActiveObjects.Clear();
 
-        foreach (var child in this.GetChildren())
+        if (BossOnly)
         {
-            if (child is Spatial spatial)
-                LevelObjects.Add(spatial);
+            var boss = this.FindChild<Boss>();
+            LevelObjects.Add(boss);
+            boss.Translation = boss.Translation.setZ(-15);        
+        }
+        else
+        {
+            foreach (var child in this.GetChildren())
+            {
+                if (child is Spatial spatial)
+                    LevelObjects.Add(spatial);
+            }
         }
     }
 
@@ -67,6 +77,9 @@ public class Level : Node
         {
             case EnemySettings enemy:
                 return enemy.level_scroll_speed;
+
+            case Boss boss:
+                return boss.active ? 0 : 1f;
 
             default:
                 return 1f;

@@ -1,4 +1,4 @@
-[gd_scene load_steps=11 format=2]
+[gd_scene load_steps=12 format=2]
 
 [ext_resource path="res://Assets/Enemy/Animations/Enemy1 png seq/frame0002.png" type="Texture" id=1]
 [ext_resource path="res://Assets/Enemy/Enemy.cs" type="Script" id=2]
@@ -7,6 +7,7 @@
 [ext_resource path="res://Assets/Enemy/Animations/Enemy1 png seq/frame0004.png" type="Texture" id=5]
 [ext_resource path="res://Assets/Enemy/Animations/Enemy1 png seq/frame0003.png" type="Texture" id=6]
 [ext_resource path="res://Assets/Enemy/Animations/Enemy1 png seq/frame0000.png" type="Texture" id=7]
+[ext_resource path="res://Assets/Player/shadow.png" type="Texture" id=8]
 
 [sub_resource type="Curve3D" id=2]
 _data = {
@@ -46,4 +47,10 @@ shape = SubResource( 1 )
 [node name="Sprite3D" type="AnimatedSprite3D" parent="PathFollow/Enemy/Model"]
 transform = Transform( 0.45, 0, 0, 0, -1.96701e-08, 0.45, 0, -0.45, -1.96701e-08, 0, 0, 0 )
 frames = SubResource( 3 )
+frame = 2
 playing = true
+
+[node name="Shadow" type="Sprite3D" parent="PathFollow/Enemy"]
+transform = Transform( 2.09761, 0, 0, 0, -1.59494e-07, 2.33041, 0, -1.82439, -5.09326e-08, -0.0665541, -0.43821, 1.14957 )
+modulate = Color( 1, 1, 1, 0.368627 )
+texture = ExtResource( 8 )

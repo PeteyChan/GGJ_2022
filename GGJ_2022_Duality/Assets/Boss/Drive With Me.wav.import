@@ -1,0 +1,21 @@
+[remap]
+
+importer="wav"
+type="AudioStreamSample"
+path="res://.import/Drive With Me.wav-ad1a9e613a04854f00412855deef7abb.sample"
+
+[deps]
+
+source_file="res://Assets/Boss/Drive With Me.wav"
+dest_files=[ "res://.import/Drive With Me.wav-ad1a9e613a04854f00412855deef7abb.sample" ]
+
+[params]
+
+force/8_bit=false
+force/mono=false
+force/max_rate=false
+force/max_rate_hz=44100
+edit/trim=false
+edit/normalize=false
+edit/loop=false
+compress/mode=0

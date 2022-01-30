@@ -18,6 +18,7 @@ public class BulletHitEffect : Spatial
         effect.Translation = position;
         effect.time = 0;
         Scene.Current.AddChild(effect);
+        BulletHitSound.PlaySound();
         return effect;
     }
 

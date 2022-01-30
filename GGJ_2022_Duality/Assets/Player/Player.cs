@@ -13,6 +13,7 @@ public class Player : Area
     AnimationPlayer animator;
     Spatial model;
     AnimatedSprite3D sprite;
+    Boss boss;
 
     Vector3 input_direction => new Vector3(right - left, 0, up - down);
 
@@ -29,7 +30,8 @@ public class Player : Area
         Invincible,
         EnemyColliison,
         Damaged,
-        Destroyed
+        Destroyed,
+        Win
     }
 
     float colliison_timer;
@@ -58,6 +60,7 @@ public class Player : Area
                     sprite = this.FindChild<AnimatedSprite3D>();
                     model = sprite.FindParent<Spatial>();
                     animator = this.FindChild<AnimationPlayer>();
+                    boss = Scene.Current.FindChild<Boss>();
 
                     var area = this.FindChild<Area>();
 
@@ -81,6 +84,13 @@ public class Player : Area
                             case Enemy enemy:
                             {
                                 enemy_position = enemy.sprite.GlobalTransform.origin;
+                                stateMachine.next = States.EnemyColliison;
+                            }
+                            break;
+
+                            case Boss boss:
+                            {
+                                enemy_position = boss.GlobalTransform.origin;
                                 stateMachine.next = States.EnemyColliison;
                             }
                             break;
@@ -108,10 +118,10 @@ public class Player : Area
                 if (stateMachine.entered_state)
                     sprite.Modulate = Colors.White;
 
-                #if DEBUG
+#if DEBUG
                 if (enable_invincible.pressed)
                     stateMachine.next = States.Invincible;
-                #endif
+#endif
 
                 CanMove(move_speed);
                 CanShoot();
@@ -121,7 +131,11 @@ public class Player : Area
             case States.EnemyColliison:
             {
                 if (stateMachine.entered_state)
+                {
                     health--;
+                    OnEnemyCollision.PlaySound();
+                    PlayerDamageSound.PlaySound();
+                }
 
                 DamageEffect();
 
@@ -140,6 +154,9 @@ public class Player : Area
 
             case States.Damaged:
             {
+                if (stateMachine.entered_state)
+                    PlayerDamageSound.PlaySound();
+
                 CanMove(damaged_move_speed);
                 CanShoot();
                 DamageEffect();
@@ -155,16 +172,34 @@ public class Player : Area
 
             case States.Destroyed:
             {
-                QueueFree();
+                sprite.Visible = false;
+                if (stateMachine.current_time > 5f)
+                {
+                    Coroutine.Defer(
+                        () => Scene.Load("res://Scenes/Level/Level.tscn")
+                    );
+                }
             }
             break;
+
+            case States.Win:
+                sprite.Modulate = Colors.White;
+                CanMove(move_speed);
+                break;
         }
 
         Translation = new Vector3(Translation.x.clamp(x_min, x_max), 0, Translation.z.clamp(z_min, z_max));
 
+        if (boss?.health <= 0)
+            stateMachine.next = States.Win;
+
+#if DEBUG
+        //Debug.Label("Player position:", Translation);
+#endif
+
         if (shooting)
         {
-            animator.Play("Shoot");            
+            animator.Play("Shoot");
         }
         else animator.Play("Idle");
 
@@ -177,7 +212,7 @@ public class Player : Area
         {
             if (shoot.pressed)
                 shooting = true;
-            
+
             /*
             if (shoot.pressed && Time.seconds_since_startup - last_shot > shot_cooldown)
             {
@@ -209,11 +244,13 @@ public class Player : Area
     public void ShootLeft()
     {
         Bullet.Spawn(this, Translation + new Vector3(-.75f, 0, -1f), Vector3.Forward, shot_speed);
+        PlayerShootSound.PlaySound();
     }
 
     public void ShootRight()
     {
         Bullet.Spawn(this, Translation + new Vector3(.75f, 0, -1f), Vector3.Forward, shot_speed);
+        PlayerShootSound.PlaySound();
     }
 }
 

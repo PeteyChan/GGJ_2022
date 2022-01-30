@@ -1,0 +1,21 @@
+[remap]
+
+importer="wav"
+type="AudioStreamSample"
+path="res://.import/OnShoot.wav-78fb342955873ec69a7ab7095d15e527.sample"
+
+[deps]
+
+source_file="res://Assets/Enemy/OnShoot.wav"
+dest_files=[ "res://.import/OnShoot.wav-78fb342955873ec69a7ab7095d15e527.sample" ]
+
+[params]
+
+force/8_bit=false
+force/mono=false
+force/max_rate=false
+force/max_rate_hz=44100
+edit/trim=false
+edit/normalize=false
+edit/loop=false
+compress/mode=0

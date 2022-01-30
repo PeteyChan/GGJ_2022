@@ -56,9 +56,15 @@ public class Bullet : Area
         time_alive += delta;
         Translation = Translation + velocity * delta;
 
-        if (destroy || time_alive > lifespan)
+        if (destroy)
         {
             BulletHitEffect.Spawn(this.GlobalTransform.origin);
+            GetParent().RemoveChild(this);
+            bullets.Push(this);
+            SetColor(Colors.White);
+        }
+        else if (time_alive > lifespan)
+        {
             GetParent().RemoveChild(this);
             bullets.Push(this);
             SetColor(Colors.White);

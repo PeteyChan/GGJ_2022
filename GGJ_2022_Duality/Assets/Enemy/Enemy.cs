@@ -13,7 +13,8 @@ public class Enemy : Area
         Setup,
         Default,
         Damaged,
-        Destroyed
+        Destroyed,
+        DestroyInstant
     }
     StateMachine<States> stateMachine = new StateMachine<States>();
 
@@ -43,7 +44,7 @@ public class Enemy : Area
 
                     this.FindParent<Path>().OnExitPlayArea(() =>
                     {
-                        stateMachine.next = States.Destroyed;
+                        stateMachine.next = States.DestroyInstant;
                     });
 
                     this.FindChild<Area>().OnAreaEnterArea(node =>
@@ -52,7 +53,7 @@ public class Enemy : Area
                         {
                             case Bullet bullet:
                             {
-                                if (bullet.source is Player)
+                                if (bullet.source is Player && damageable)
                                 {
                                     if (stateMachine.current == States.Damaged ||
                                         stateMachine.current == States.Default)
@@ -88,8 +89,9 @@ public class Enemy : Area
 
                 Move(settings._move_speed);
 
-                if (shoot_timer < 0 && sprite.GlobalTransform.origin.z > -10)
+                if (shoot_timer < 0 && sprite.GlobalTransform.origin.z > -10 && sprite.GlobalTransform.origin.z < 10)
                 {
+                    EnemyShoot.PlaySound();
                     Bullet.Spawn(this, sprite.GlobalTransform.origin, Vector3.Back, 15f, 3f);
                     shoot_timer = Rand.FloatRange(settings._shoot_min_interval, settings._shoot_max_interval);
                 }
@@ -111,6 +113,11 @@ public class Enemy : Area
 
             case States.Destroyed:
                 EnemyDestroyAnimation.Spawn(sprite.GlobalTransform.origin);
+                EnemyDestroyedSounds.PlaySound();
+                QueueFree();
+                break;
+
+            case States.DestroyInstant:
                 QueueFree();
                 break;
         }

@@ -1,11 +1,65 @@
-[gd_scene load_steps=9 format=2]
+[gd_scene load_steps=31 format=2]
 
 [ext_resource path="res://Assets/Player/Player.tscn" type="PackedScene" id=1]
 [ext_resource path="res://Assets/Enemy/Enemy.tscn" type="PackedScene" id=2]
-[ext_resource path="res://Scenes/Level/HealthUI.cs" type="Script" id=3]
+[ext_resource path="res://Assets/Background/Cloud.tscn" type="PackedScene" id=3]
 [ext_resource path="res://Scenes/Level/Level.cs" type="Script" id=4]
 [ext_resource path="res://Assets/Player/HealthBar.png" type="Texture" id=5]
 [ext_resource path="res://Scenes/Level/HealthBar.cs" type="Script" id=6]
+[ext_resource path="res://Assets/Enemy/OnDestroy.wav" type="AudioStream" id=7]
+[ext_resource path="res://Scenes/Level/EnemyDestroyedSounds.cs" type="Script" id=8]
+[ext_resource path="res://Assets/Enemy/OnHit.wav" type="AudioStream" id=9]
+[ext_resource path="res://Scenes/Level/BulletHitSound.cs" type="Script" id=10]
+[ext_resource path="res://Scenes/Level/EnemyShoot.cs" type="Script" id=11]
+[ext_resource path="res://Assets/Enemy/OnShoot.wav" type="AudioStream" id=12]
+[ext_resource path="res://Assets/Enemy/OnBump.wav" type="AudioStream" id=13]
+[ext_resource path="res://Scenes/Level/OnEnemyCollision.cs" type="Script" id=14]
+[ext_resource path="res://Assets/Background/Never Back Down.wav" type="AudioStream" id=15]
+[ext_resource path="res://Scenes/Level/BGM.cs" type="Script" id=16]
+[ext_resource path="res://Scenes/Level/PlayerShootSound.cs" type="Script" id=17]
+[ext_resource path="res://Assets/Player/ShootSound.ogg" type="AudioStream" id=18]
+[ext_resource path="res://Assets/Player/Profile.png" type="Texture" id=19]
+[ext_resource path="res://Assets/Player/HitSound.ogg" type="AudioStream" id=20]
+[ext_resource path="res://Scenes/Level/PlayerDamageSound.cs" type="Script" id=21]
+[ext_resource path="res://Assets/Boss/HealthBar.png" type="Texture" id=22]
+[ext_resource path="res://Assets/Boss/Boss.tscn" type="PackedScene" id=23]
+[ext_resource path="res://Scenes/Level/BossHealthBar.cs" type="Script" id=24]
+
+[sub_resource type="Shader" id=3]
+code = "shader_type spatial;
+
+uniform sampler2D noise;
+
+varying vec2 tex_pos;
+
+uniform float speed = 1.0;
+
+uniform vec4 main_color : hint_color = vec4(0, .5, 1, 1);
+uniform vec4 sub_color : hint_color = vec4 (0, .7, 1, 1);
+
+void vertex()
+{
+	UV.y = UV.y + TIME * -speed;
+}
+
+void fragment()
+{
+	ALBEDO = texture(noise, UV).xyz * main_color.xyz; // + texture(noise, UV).xyz * sub_color.xyz;
+}"
+
+[sub_resource type="OpenSimplexNoise" id=6]
+seed = 4
+
+[sub_resource type="NoiseTexture" id=5]
+seamless = true
+noise = SubResource( 6 )
+
+[sub_resource type="ShaderMaterial" id=4]
+shader = SubResource( 3 )
+shader_param/speed = 1.0
+shader_param/main_color = Color( 0, 0.5, 1, 1 )
+shader_param/sub_color = Color( 0, 0.7, 1, 1 )
+shader_param/noise = SubResource( 5 )
 
 [sub_resource type="OpenSimplexNoise" id=1]
 
@@ -26,19 +80,9 @@ size = 40.0
 [node name="CanvasLayer" type="CanvasLayer" parent="."]
 
 [node name="Panel" type="Panel" parent="CanvasLayer"]
+visible = false
 anchor_right = 0.2
 anchor_bottom = 1.0
-__meta__ = {
-"_edit_use_anchors_": false
-}
-
-[node name="Health" type="Label" parent="CanvasLayer/Panel"]
-margin_left = 13.0
-margin_top = 14.0
-margin_right = 55.0
-margin_bottom = 28.0
-text = "Health: 10"
-script = ExtResource( 3 )
 __meta__ = {
 "_edit_use_anchors_": false
 }
@@ -51,19 +95,31 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="HealthBar" type="Panel" parent="CanvasLayer"]
-margin_left = 200.0
-margin_top = 663.0
-margin_right = 662.0
-margin_bottom = 699.0
-rect_rotation = -89.9999
-rect_scale = Vector2( 1.30923, 1.30923 )
-script = ExtResource( 6 )
+[node name="TextureRect" type="TextureRect" parent="CanvasLayer"]
+margin_left = -35.0
+margin_top = -12.0
+margin_right = 477.0
+margin_bottom = 1012.0
+rect_scale = Vector2( 0.545, 0.73 )
+texture = ExtResource( 19 )
 __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="HealthBar2" type="ColorRect" parent="CanvasLayer/HealthBar"]
+[node name="BossHealthBar" type="Panel" parent="CanvasLayer"]
+margin_left = 1030.0
+margin_top = 688.0
+margin_right = 1492.0
+margin_bottom = 724.0
+rect_rotation = -89.9999
+rect_scale = Vector2( 1.44201, 1.30923 )
+script = ExtResource( 24 )
+__meta__ = {
+"_edit_group_": true,
+"_edit_use_anchors_": false
+}
+
+[node name="HealthBar2" type="ColorRect" parent="CanvasLayer/BossHealthBar"]
 modulate = Color( 0.513726, 0.976471, 0.490196, 1 )
 margin_right = 462.0
 margin_bottom = 36.0
@@ -72,7 +128,39 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="TextureRect" type="TextureRect" parent="CanvasLayer/HealthBar"]
+[node name="TextureRect" type="TextureRect" parent="CanvasLayer/BossHealthBar"]
+margin_left = -27.0
+margin_top = -44.0
+margin_right = 485.0
+margin_bottom = 84.0
+texture = ExtResource( 22 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="PlayerHealthBar" type="Panel" parent="CanvasLayer"]
+margin_left = 211.0
+margin_top = 688.0
+margin_right = 673.0
+margin_bottom = 724.0
+rect_rotation = -89.9999
+rect_scale = Vector2( 1.44201, 1.30923 )
+script = ExtResource( 6 )
+__meta__ = {
+"_edit_group_": true,
+"_edit_use_anchors_": false
+}
+
+[node name="HealthBar2" type="ColorRect" parent="CanvasLayer/PlayerHealthBar"]
+modulate = Color( 0.513726, 0.976471, 0.490196, 1 )
+margin_right = 462.0
+margin_bottom = 36.0
+color = Color( 0.380392, 0.670588, 0.203922, 1 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="TextureRect" type="TextureRect" parent="CanvasLayer/PlayerHealthBar"]
 margin_left = -27.0
 margin_top = -44.0
 margin_right = 485.0
@@ -87,191 +175,214 @@ script = ExtResource( 4 )
 
 [node name="Enemy" parent="Enemy Placements" instance=ExtResource( 2 )]
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -9.91526, 0, -19.0988 )
+_health = 2.0
 
 [node name="Enemy2" parent="Enemy Placements" instance=ExtResource( 2 )]
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -7.73363, 0, -22.3469 )
+_health = 2.0
 
 [node name="Enemy3" parent="Enemy Placements" instance=ExtResource( 2 )]
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -5.69892, 0, -25.0274 )
+_health = 2.0
 
 [node name="Enemy4" parent="Enemy Placements" instance=ExtResource( 2 )]
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -9.91526, 0, -45.0988 )
 _move_speed = 2.0
-_health = 10.0
+_health = 2.0
 
 [node name="Enemy5" parent="Enemy Placements" instance=ExtResource( 2 )]
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -7.73363, 0, -48.3469 )
 _move_speed = 2.0
-_health = 10.0
+_health = 2.0
 
 [node name="Enemy6" parent="Enemy Placements" instance=ExtResource( 2 )]
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -5.69892, 0, -51.0274 )
 _move_speed = 2.0
-_health = 10.0
+_health = 2.0
 
 [node name="Enemy7" parent="Enemy Placements" instance=ExtResource( 2 )]
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 4.67696, 0, -35.563 )
 _reverse_movement = true
+_health = 2.0
 
 [node name="Enemy8" parent="Enemy Placements" instance=ExtResource( 2 )]
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 6.85859, 0, -38.8111 )
 _reverse_movement = true
+_health = 2.0
 
 [node name="Enemy9" parent="Enemy Placements" instance=ExtResource( 2 )]
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 8.8933, 0, -41.4916 )
 _reverse_movement = true
+_health = 2.0
 
 [node name="Enemy10" parent="Enemy Placements" instance=ExtResource( 2 )]
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 4.67696, 0, -64.563 )
 _shoot_max_interval = 2.0
 _move_speed = 10.0
+_health = 2.0
 
 [node name="Enemy11" parent="Enemy Placements" instance=ExtResource( 2 )]
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 6.85859, 0, -67.8111 )
 _shoot_max_interval = 2.0
 _move_speed = 10.0
+_health = 2.0
 
 [node name="Enemy12" parent="Enemy Placements" instance=ExtResource( 2 )]
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 8.8933, 0, -70.4916 )
 _shoot_max_interval = 2.0
 _move_speed = 10.0
-
-[node name="Enemy43" parent="Enemy Placements" instance=ExtResource( 2 )]
-transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 10.8933, 0, -72.4916 )
-_shoot_max_interval = 2.0
-_move_speed = 10.0
-
-[node name="Enemy44" parent="Enemy Placements" instance=ExtResource( 2 )]
-transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 12.8933, 0, -74.4916 )
-_shoot_max_interval = 2.0
-_move_speed = 10.0
+_health = 2.0
 
 [node name="Enemy13" parent="Enemy Placements" instance=ExtResource( 2 )]
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -9.49924, 0, -77.1849 )
 _reverse_movement = true
+_health = 2.0
 
 [node name="Enemy14" parent="Enemy Placements" instance=ExtResource( 2 )]
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -7.31761, 0, -80.433 )
 _reverse_movement = true
+_health = 2.0
 
 [node name="Enemy15" parent="Enemy Placements" instance=ExtResource( 2 )]
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -5.28289, 0, -83.1135 )
 _reverse_movement = true
+_health = 2.0
 
 [node name="Enemy16" parent="Enemy Placements" instance=ExtResource( 2 )]
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0.500765, 0, -105.185 )
 _shoot_min_interval = 0.5
 _shoot_max_interval = 2.0
 _move_speed = 12.0
-_health = 6.0
+_health = 2.0
 
 [node name="Enemy17" parent="Enemy Placements" instance=ExtResource( 2 )]
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0.682395, 0, -108.433 )
 _shoot_min_interval = 0.5
 _shoot_max_interval = 2.0
 _move_speed = 12.0
-_health = 6.0
+_health = 2.0
 
 [node name="Enemy18" parent="Enemy Placements" instance=ExtResource( 2 )]
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0.717106, 0, -111.113 )
 _shoot_min_interval = 0.5
 _shoot_max_interval = 2.0
 _move_speed = 12.0
-_health = 6.0
+_health = 2.0
 
 [node name="Enemy19" parent="Enemy Placements" instance=ExtResource( 2 )]
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -0.91526, 0, -131.099 )
+_health = 2.0
 
 [node name="Enemy20" parent="Enemy Placements" instance=ExtResource( 2 )]
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 1.26637, 0, -134.347 )
+_health = 2.0
 
 [node name="Enemy21" parent="Enemy Placements" instance=ExtResource( 2 )]
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 3.30108, 0, -137.027 )
+_health = 2.0
 
 [node name="Enemy22" parent="Enemy Placements" instance=ExtResource( 2 )]
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -0.91526, 0, -157.099 )
 _move_speed = 8.0
+_health = 2.0
 
 [node name="Enemy23" parent="Enemy Placements" instance=ExtResource( 2 )]
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 1.26637, 0, -160.347 )
 _move_speed = 8.0
+_health = 2.0
 
 [node name="Enemy24" parent="Enemy Placements" instance=ExtResource( 2 )]
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 3.30108, 0, -163.027 )
 _move_speed = 8.0
+_health = 2.0
 
 [node name="Enemy25" parent="Enemy Placements" instance=ExtResource( 2 )]
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 14.8436, 0, -147.563 )
 _reverse_movement = true
+_health = 2.0
 
 [node name="Enemy26" parent="Enemy Placements" instance=ExtResource( 2 )]
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 17.0252, 0, -150.811 )
 _reverse_movement = true
+_health = 2.0
 
 [node name="Enemy27" parent="Enemy Placements" instance=ExtResource( 2 )]
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 19.0599, 0, -153.492 )
 _reverse_movement = true
+_health = 2.0
 
 [node name="Enemy28" parent="Enemy Placements" instance=ExtResource( 2 )]
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 14.8436, 0, -176.563 )
 _shoot_max_interval = 2.0
 _move_speed = 10.0
+_health = 2.0
 
 [node name="Enemy29" parent="Enemy Placements" instance=ExtResource( 2 )]
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 17.0252, 0, -179.811 )
 _shoot_max_interval = 2.0
 _move_speed = 10.0
+_health = 2.0
 
 [node name="Enemy30" parent="Enemy Placements" instance=ExtResource( 2 )]
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 19.0599, 0, -182.492 )
 _shoot_max_interval = 2.0
 _move_speed = 10.0
+_health = 2.0
 
 [node name="Enemy37" parent="Enemy Placements" instance=ExtResource( 2 )]
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -17.1564, 0, -147.563 )
 _reverse_movement = true
+_health = 2.0
 
 [node name="Enemy38" parent="Enemy Placements" instance=ExtResource( 2 )]
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -14.9748, 0, -150.811 )
 _reverse_movement = true
+_health = 2.0
 
 [node name="Enemy39" parent="Enemy Placements" instance=ExtResource( 2 )]
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -12.9401, 0, -153.492 )
 _reverse_movement = true
+_health = 2.0
 
 [node name="Enemy40" parent="Enemy Placements" instance=ExtResource( 2 )]
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -17.1564, 0, -176.563 )
 _reverse_movement = true
 _shoot_max_interval = 2.0
 _move_speed = 10.0
+_health = 2.0
 
 [node name="Enemy41" parent="Enemy Placements" instance=ExtResource( 2 )]
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -14.9748, 0, -179.811 )
 _reverse_movement = true
 _shoot_max_interval = 2.0
 _move_speed = 10.0
+_health = 2.0
 
 [node name="Enemy42" parent="Enemy Placements" instance=ExtResource( 2 )]
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -12.9401, 0, -182.492 )
 _reverse_movement = true
 _shoot_max_interval = 2.0
 _move_speed = 10.0
+_health = 2.0
 
 [node name="Enemy31" parent="Enemy Placements" instance=ExtResource( 2 )]
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -0.499235, 0, -189.185 )
+_health = 2.0
 
 [node name="Enemy32" parent="Enemy Placements" instance=ExtResource( 2 )]
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 1.68239, 0, -192.433 )
+_health = 2.0
 
 [node name="Enemy33" parent="Enemy Placements" instance=ExtResource( 2 )]
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 3.71711, 0, -195.113 )
+_health = 2.0
 
 [node name="Enemy34" parent="Enemy Placements" instance=ExtResource( 2 )]
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0.500765, 0, -217.185 )
 _shoot_min_interval = 0.5
 _shoot_max_interval = 1.0
 _move_speed = 6.0
-_health = 16.0
+_health = 2.0
 
 [node name="Enemy35" parent="Enemy Placements" instance=ExtResource( 2 )]
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0.682395, 0, -220.433 )
@@ -279,18 +390,83 @@ _reverse_movement = true
 _shoot_min_interval = 0.5
 _shoot_max_interval = 1.0
 _move_speed = 6.0
-_health = 16.0
+_health = 2.0
 
 [node name="Enemy36" parent="Enemy Placements" instance=ExtResource( 2 )]
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0.717106, 0, -223.113 )
 _shoot_min_interval = 0.5
 _shoot_max_interval = 1.0
 _move_speed = 6.0
-_health = 16.0
+_health = 2.0
+
+[node name="Boss" parent="Enemy Placements" instance=ExtResource( 23 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -342.282 )
 
 [node name="Player" parent="." instance=ExtResource( 1 )]
 
-[node name="Sprite3D" type="Sprite3D" parent="."]
-transform = Transform( 11, 0, 0, 0, -4.37114e-08, 1, 0, -11, -4.80825e-07, 0, -2, 0 )
+[node name="Water" type="Sprite3D" parent="."]
+transform = Transform( 11, 0, 0, 0, -4.37114e-08, 1, 0, -11, -4.80825e-07, 0, -5, 0 )
+material_override = SubResource( 4 )
 modulate = Color( 0.196078, 0.419608, 0.666667, 1 )
 texture = SubResource( 2 )
+
+[node name="Cloud" parent="." instance=ExtResource( 3 )]
+transform = Transform( 3.1, 0, 0, 0, 1, 0, 0, 0, 3.1, -7, 0, -15 )
+move_speed = 0.5
+
+[node name="Cloud3" parent="." instance=ExtResource( 3 )]
+transform = Transform( 2.17, 0, 0, 0, 1, 0, 0, 0, 1.86, 6, 2, -15 )
+move_speed = 1.0
+
+[node name="Cloud4" parent="." instance=ExtResource( 3 )]
+transform = Transform( 2.17, 0, 0, 0, 1, 0, 0, 0, 1.86, 6, 2, -15 )
+move_speed = 1.0
+
+[node name="Cloud5" parent="." instance=ExtResource( 3 )]
+transform = Transform( 2.17, 0, 0, 0, 1, 0, 0, 0, 1.86, -15, 2, -4 )
+move_speed = 1.2
+
+[node name="Cloud6" parent="." instance=ExtResource( 3 )]
+transform = Transform( 2.17, 0, 0, 0, 1, 0, 0, 0, 1.86, -15, 2, -4 )
+move_speed = 1.2
+
+[node name="Cloud2" parent="." instance=ExtResource( 3 )]
+transform = Transform( 4.34, 0, 0, 0, 1, 0, 0, 0, 3.038, 9, -1, 1 )
+move_speed = 0.5
+
+[node name="Sounds" type="Node" parent="."]
+
+[node name="EnemyDestroyedSounds" type="AudioStreamPlayer" parent="Sounds"]
+stream = ExtResource( 7 )
+volume_db = -20.0
+script = ExtResource( 8 )
+
+[node name="BulletHitSound" type="AudioStreamPlayer" parent="Sounds"]
+stream = ExtResource( 9 )
+volume_db = -10.0
+script = ExtResource( 10 )
+
+[node name="EnemyShoot" type="AudioStreamPlayer" parent="Sounds"]
+stream = ExtResource( 12 )
+volume_db = -10.0
+script = ExtResource( 11 )
+
+[node name="OnEnemyCollision" type="AudioStreamPlayer" parent="Sounds"]
+stream = ExtResource( 13 )
+volume_db = -15.0
+script = ExtResource( 14 )
+
+[node name="BGM" type="AudioStreamPlayer" parent="Sounds"]
+stream = ExtResource( 15 )
+volume_db = -18.0
+script = ExtResource( 16 )
+
+[node name="PlayerShootSound" type="AudioStreamPlayer" parent="Sounds"]
+stream = ExtResource( 18 )
+volume_db = -20.0
+script = ExtResource( 17 )
+
+[node name="PlayerDamageSound" type="AudioStreamPlayer" parent="Sounds"]
+stream = ExtResource( 20 )
+volume_db = -12.0
+script = ExtResource( 21 )
