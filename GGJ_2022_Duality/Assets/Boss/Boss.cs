@@ -25,7 +25,7 @@ public class Boss : Area
 
     StateMachine<States> statemachine = new StateMachine<States>();
 
-    Sprite3D sprite;
+    AnimatedSprite3D sprite;
 
     float damage_timer;
 
@@ -45,7 +45,7 @@ public class Boss : Area
                 if (statemachine.entered_state)
                 {
                     health = max_health;
-                    sprite = this.FindChild<Sprite3D>();
+                    sprite = this.FindChild<AnimatedSprite3D>();
                     this.OnEnterPlayArea(() =>
                     {
                         statemachine.next = States.GoToNeutral;
@@ -108,6 +108,9 @@ public class Boss : Area
                 
                 break;
         }
+
+        if (!sprite.Playing)
+            sprite.Play();
 
         if (damage_timer > 0)
         {
